@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+<title>AR Agent World</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { overflow:hidden; background:#000; font-family:system-ui,sans-serif; }
+
+  #loading {
+    position:fixed; inset:0; z-index:100;
+    background:#000e1f;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
+    transition: opacity .4s;
+  }
+  #loading h2 { color:#64e6aa; font-size:16px; letter-spacing:2px; }
+  #loading p  { color:rgba(255,255,255,.4); font-size:11px; text-align:center; max-width:260px; line-height:1.8; }
+  .spinner {
+    width:36px; height:36px; border-radius:50%;
+    border:2px solid rgba(100,230,170,.15);
+    border-top-color:#64e6aa;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  #hint {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    z-index:50; padding:8px 20px; border-radius:20px;
+    background:rgba(0,0,0,.6); border:1px solid rgba(100,230,170,.3);
+    color:rgba(255,255,255,.7); font-size:11px;
+    pointer-events:none; white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <h2>⬡ AGENT AR</h2>
+  <p>Đang tải AR engine...<br/>
+  Sau khi load xong, hướng camera vào<br/>
+  <strong style="color:#64e6aa">marker HIRO</strong> bên dưới</p>
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Hiro_marker_ARjs.png/240px-Hiro_marker_ARjs.png"
+    style="width:110px;border-radius:8px;border:2px solid rgba(100,230,170,.4)"
+    alt="Hiro marker"
+  />
+  <p style="font-size:10px;color:rgba(255,255,255,.3)">
+    In marker này hoặc mở trên màn hình khác rồi quét
+  </p>
+</div>
+
+<div id="hint">📷 Hướng camera vào marker HIRO</div>
+
+<!-- A-Frame + AR.js từ cdnjs (không bị block) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
+
+<!-- AR.js không có trên cdnjs → dùng jsDelivr (được phép) -->
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const l = document.getElementById('loading');
+      l.style.opacity = '0';
+      setTimeout(() => l.style.display = 'none', 400);
+    }, 3500);
+  });
+</script>
+
+<a-scene
+  embedded
+  arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+  renderer="logarithmicDepthBuffer: true; antialias: true;"
+  vr-mode-ui="enabled: false"
+  loading-screen="enabled: false"
+>
+
+  <a-marker preset="hiro">
+
+    <!-- Card nền -->
+    <a-plane
+      position="0 0 0" rotation="-90 0 0"
+      width="1.8" height="1.1"
+      color="#0a1628" opacity="0.93"
+    ></a-plane>
+
+    <!-- Top accent bar -->
+    <a-plane
+      position="0 0.001 -0.46" rotation="-90 0 0"
+      width="1.8" height="0.07"
+      color="#3b82f6"
+    ></a-plane>
+
+    <!-- Agent name -->
+    <a-text
+      value="LEAD SCRAPER"
+      position="-0.82 0.01 -0.3"
+      rotation="-90 0 0"
+      color="#93c5fd" width="4"
+      font="roboto"
+    ></a-text>
+
+    <!-- Role -->
+    <a-text
+      value="Web scraping & lead gen"
+      position="-0.82 0.01 -0.12"
+      rotation="-90 0 0"
+      color="#ffffff" width="3.2" opacity="0.55"
+    ></a-text>
+
+    <!-- Progress bar bg -->
+    <a-plane
+      position="0 0.01 0.08" rotation="-90 0 0"
+      width="1.6" height="0.07"
+      color="#1e3a5f"
+    ></a-plane>
+
+    <!-- Progress fill 82% (width 1.6 * 0.82 = 1.312, offset left) -->
+    <a-plane
+      position="-0.144 0.012 0.08" rotation="-90 0 0"
+      width="1.312" height="0.07"
+      color="#3b82f6"
+    ></a-plane>
+
+    <!-- Status + percent -->
+    <a-text
+      value="● Processing          82%"
+      position="-0.82 0.01 0.28"
+      rotation="-90 0 0"
+      color="#60a5fa" width="3.2"
+    ></a-text>
+
+    <!-- Floating animation -->
+    <a-animation
+      attribute="position"
+      from="0 0 0" to="0 0.1 0"
+      direction="alternate" dur="1800"
+      easing="easeInOutSine" repeat="indefinite"
+    ></a-animation>
+
+  </a-marker>
+
+  <a-entity camera></a-entity>
+
+</a-scene>
+
+</body>
+</html>
